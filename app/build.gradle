@@ -1,0 +1,304 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+
+//    id "com.android.application"
+//    id "com.google.firebase.appdistribution"
+//    id "com.google.firebase.crashlytics"
+//    id "com.google.gms.google-services"
+    id "kotlin-android"
+    id "kotlin-kapt"
+    id "kotlin-parcelize"
+    id "dagger.hilt.android.plugin"
+    id "org.jlleitschuh.gradle.ktlint"
+    id "kover"
+    id "de.mannodermaus.android-junit5"
+    id "com.google.devtools.ksp" version "1.6.0-1.0.2"
+}
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        applicationId "com.example.myapplication"
+        minSdk 26
+        targetSdk 31
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArgument "runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+
+        def koverSet = ""
+        unitTests.all {
+            useJUnitPlatform()
+
+            kover { disabled = true } // disable all, except for specific items
+            if (koverSet == "") {
+                koverSet = name // only needed to run on the first flavor
+                kover {
+                    excludes = [
+                            '**/*_MembersInjector.class',
+                            '**/Dagger*Component.class', // covers component implementations
+                            '**/Dagger*Component$Builder.class', // covers component builders
+                            '**/*Module_*Factory.class'
+                    ]
+
+                    disabled = false
+                }
+            }
+            // println "Item: " + name + ", kover: " + !kover.disabled
+        }
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+//    testImplementation 'junit:junit:4.13.2'
+//    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+
+    implementation fileTree(include: ["*.jar"], dir: "libs")
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
+
+    // Android
+    implementation "androidx.activity:activity-ktx:1.3.1"
+    implementation "androidx.fragment:fragment-ktx:1.3.6"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
+
+    // Android Lifecycle
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0-alpha05"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.2.0-alpha05"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.2.0-alpha05"
+    kapt "androidx.lifecycle:lifecycle-compiler:2.2.0-alpha05"
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+
+    // Dependency Injection
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    // Firebase
+    implementation "com.google.firebase:firebase-messaging:20.2.4"
+    implementation "com.google.firebase:firebase-core:17.5.0"
+
+    // Networking
+    implementation "com.android.volley:volley:1.1.0"
+    implementation "org.jsoup:jsoup:1.8.3"
+    implementation "com.google.code.gson:gson:2.8.9"
+    implementation "com.squareup.moshi:moshi:1.13.0"
+    implementation("com.squareup.moshi:moshi-kotlin:1.13.0")
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
+
+    // Analytics
+//    implementation "com.google.firebase:firebase-crashlytics:17.2.2"
+//    implementation "com.google.firebase:firebase-analytics:17.5.0"
+//    implementation "com.instabug.library:instabug:10.5.0"
+
+    // Security
+    implementation "com.scottyab:rootbeer-lib:0.0.7"
+    implementation "com.datatheorem.android.trustkit:trustkit:1.0.1"
+    implementation "androidx.biometric:biometric:1.1.0"
+
+    // Google play
+    implementation "com.google.android.gms:play-services-auth:17.0.0"
+    implementation "com.google.android.gms:play-services-auth-api-phone:17.4.0"
+    implementation "com.google.android.gms:play-services-vision:17.0.2"
+
+    // UI
+    // - Android
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
+    implementation "androidx.paging:paging-runtime:2.1.0"
+    implementation "androidx.recyclerview:recyclerview:1.1.0-beta04"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+    implementation "com.google.android.flexbox:flexbox:3.0.0"
+    // -3rd party
+    implementation "me.relex:circleindicator:2.1.4"
+    implementation "com.cepheuen.elegant-number-button:lib:1.0.2"
+    implementation "io.michaelrocks:libphonenumber-android:8.12.6"
+    implementation "de.halfbit:pinned-section-listview:1.0.0"
+    implementation "com.thoughtbot:expandablerecyclerview:1.4"
+    implementation "com.github.barteksc:android-pdf-viewer:2.8.2"
+    implementation "com.github.mukeshsolanki:android-otpview-pinview:2.1.1"
+    // implementation "com.github.vihtarb:tooltip:0.1.9"
+    implementation "com.fenchtose:tooltip:0.1.6"
+    implementation "com.github.PhilJay:MPAndroidChart:v3.1.0"
+
+    // UI helpers
+    implementation "com.jakewharton:butterknife:10.1.0"
+    kapt "com.jakewharton:butterknife-compiler:10.1.0"
+    implementation "com.github.nitrico.lastadapter:lastadapter:2.3.0"
+    implementation 'com.github.mmin18:realtimeblurview:1.2.1'
+
+    // System
+    implementation "org.greenrobot:eventbus:3.0.0"
+
+    // Testing
+    androidTestImplementation "androidx.test:runner:1.4.0"
+    androidTestImplementation "androidx.test:rules:1.4.0"
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+
+    testImplementation "io.strikt:strikt-core:0.34.0"
+
+    // - JUnit5
+    // (Required) Writing and executing Unit Tests on the JUnit Platform
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
+    // (Optional) "Parameterized Tests"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
+    //  The instrumentation test companion libraries
+    androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.3.0"
+    androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.3.0"
+    // (Optional) If you also have JUnit 4-based tests
+    testImplementation "junit:junit:4.13.2"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.8.2"
+
+    // - Hilt
+    // For Robolectric tests.
+    testImplementation("com.google.dagger:hilt-android-testing:2.38.1")
+    // ...with Kotlin.
+    kaptTest("com.google.dagger:hilt-android-compiler:2.38.1")
+    // For instrumented tests.
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.38.1")
+    // ...with Kotlin.
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.38.1")
+
+    // - Espresso
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.4.0", {
+        exclude group: "com.android.support", module: "support-annotations"
+    }
+    // Espresso-contrib for DatePicker, RecyclerView, Drawer actions, Accessibility checks, CountingIdlingResource
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.4.0") {
+        exclude group: "com.android.support"
+    }
+    // Espresso-idling-resource for synchronization with background jobs
+    androidTestImplementation("androidx.test.espresso:espresso-idling-resource:3.4.0") {
+        exclude group: "com.android.support"
+    }
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0") {
+        exclude group: "com.android.support"
+    }
+
+    // - Mockk
+    testImplementation "io.mockk:mockk:1.12.2"
+    testImplementation "io.mockk:mockk-agent-jvm:1.12.2"
+    androidTestImplementation "io.mockk:mockk-android:1.12.2"
+    androidTestImplementation "io.mockk:mockk-agent-jvm:1.12.2"
+
+    // - Others
+    androidTestImplementation "com.google.guava:guava:24.1-jre"
+    androidTestImplementation("com.squareup.spoon:spoon-client:1.6.4") {
+        exclude module: "guava"
+    }
+}
+
+kover {
+    instrumentAndroidPackage = false
+}
+
+tasks.koverVerify {
+    // https://github.com/Kotlin/kotlinx-kover#verification
+    includes = ['*']
+    rule {
+        name = "Minimum line coverage rate"
+        bound {
+            minValue = 30
+        }
+    }
+}
+
+tasks.koverMergedHtmlReport {
+    enabled = true                          // false to disable report generation
+//    htmlReportDir.set(layout.buildDirectory.dir("my-project-report/html-result"))
+
+    excludes = ["*_HiltModules", "*_Factory"]
+//    includes = ['com.example.*']             // inclusion rules for classes
+//    excludes = ['com.example.subpackage.*']  // exclusion rules for classes
+}
+
+import kotlin.Pair
+
+import java.util.concurrent.TimeUnit
+
+// Log timings per task.
+class TimingsListener implements TaskExecutionListener, BuildListener {
+    private long startTime
+    private timings = []
+
+    @Override
+    void beforeExecute(Task task) {
+        startTime = System.nanoTime()
+    }
+
+    @Override
+    void afterExecute(Task task, TaskState taskState) {
+        def ms = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+        timings.add(new Pair<Integer, String>(ms, task.path))
+        task.project.logger.warn "${task.path} took ${ms}ms"
+    }
+
+    @Override
+    void buildFinished(BuildResult result) {
+        println "Task timings:"
+        def tmp = timings.toSorted(new Comparator<Pair<Integer, String>>() {
+            @Override
+            int compare(Pair<Integer, String> o, Pair<Integer, String> t1) {
+                return o.first - t1.first
+            }
+        })
+        for (timing in tmp) {
+            if (timing.first >= 1000) {
+                printf "%ss  %s\n", timing.first / 1000, timing.second
+            }
+        }
+    }
+
+    @Override
+    void projectsEvaluated(Gradle gradle) {}
+
+    @Override
+    void projectsLoaded(Gradle gradle) {}
+
+//    @Override
+//    void buildStarted(Gradle gradle) {}
+
+    @Override
+    void beforeSettings(Settings settings) {
+        super.beforeSettings(settings)
+    }
+
+    @Override
+    void settingsEvaluated(Settings settings) {}
+}
+
+gradle.addListener new TimingsListener()
